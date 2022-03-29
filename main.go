@@ -16,14 +16,14 @@ func main() {
 	l := log.New(os.Stdout, "product-api", log.LstdFlags)
 
 	// Initializing Handlers
-	hh := handlers.NewHello(l)
-	gh := handlers.NewGoodbye(l)
+	ph := handlers.NewProducts(l)
 
 	sm := http.NewServeMux()
 
 	// Defining urls and handlers which will handle those requests
-	sm.Handle("/", hh)
-	sm.Handle("/goodbye", gh)
+	// If requests comes at any path (/ this defines any path) then
+	// go will call the ServeHttp method of our handler
+	sm.Handle("/", ph)
 
 	// Initializing Server
 	s := &http.Server{
