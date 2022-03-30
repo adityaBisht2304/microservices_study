@@ -1,0 +1,4 @@
+=>  req.Body is a io.Reader
+=>  responseWriter is a io.writer
+=>  json.Encoder and json.Decoder are faster than json.Marshal and json.Unmarshal
+
