@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/microservices_study/handlers"
 )
 
@@ -18,12 +19,18 @@ func main() {
 	// Initializing Handlers
 	ph := handlers.NewProducts(l)
 
-	sm := http.NewServeMux()
+	sm := mux.NewRouter()
 
-	// Defining urls and handlers which will handle those requests
-	// If requests comes at any path (/ this defines any path) then
-	// go will call the ServeHttp method of our handler
-	sm.Handle("/", ph)
+	getRouter := sm.Methods(http.MethodGet).Subrouter()
+	getRouter.HandleFunc("/", ph.GetProducts)
+
+	postRouter := sm.Methods(http.MethodPost).Subrouter()
+	postRouter.HandleFunc("/", ph.AddProduct)
+	postRouter.Use(ph.MiddlewareValidateProduct)
+
+	putRouter := sm.Methods(http.MethodPut).Subrouter()
+	putRouter.HandleFunc("/{id:[0-9]+}", ph.UpdateProduct)
+	putRouter.Use(ph.MiddlewareValidateProduct)
 
 	// Initializing Server
 	s := &http.Server{
