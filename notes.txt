@@ -1,4 +1,9 @@
 =>  req.Body is a io.Reader
 =>  responseWriter is a io.writer
 =>  json.Encoder and json.Decoder are faster than json.Marshal and json.Unmarshal
+=>  IN WINDOWs
+    --- POST REQUEST
+        curl -v localhost:9090 -d"{\"id\":4,\"name\":\"Tea\",\"description\":\"hot cup of tea\"}" | jq
+    --- PUT REQUEST
+        curl -v localhost:9090/2 -XPUT -d"{\"id\":2,\"name\":\"Tea\",\"description\":\"hot cup of tea\"}" | jq
 

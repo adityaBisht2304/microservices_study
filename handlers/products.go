@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -43,7 +44,8 @@ func (p *Products) GetProducts(rw http.ResponseWriter, req *http.Request) {
 }
 
 // To execute POST in WINDOWS
-// curl -v localhost:9090 -d"{\"id\":4,\"name\":\"Tea\",\"description\":\"hot cup of tea\"}" | jq
+// curl -v localhost:9090 -d"{\"id\":4,\"name\":\"Tea\",\"description\":\"hot cup of tea\"}"
+// curl -v localhost:9090 -d"{\"id\":4,\"name\":\"Tea\",\"description\":\"hot cup of tea\",\"price\":4.00,\"sku\":\"abc-def-fgh\"}"
 func (p *Products) AddProduct(rw http.ResponseWriter, req *http.Request) {
 	p.l.Println("Handle POST Products")
 	prod := req.Context().Value(KeyProduct{}).(*data.Product)
@@ -51,7 +53,7 @@ func (p *Products) AddProduct(rw http.ResponseWriter, req *http.Request) {
 }
 
 // To execute PUT in WINDOWS
-// curl -v localhost:9090/2 -XPUT -d"{\"id\":2,\"name\":\"Tea\",\"description\":\"hot cup of tea\"}" | jq
+// curl -v localhost:9090/2 -XPUT -d"{\"id\":2,\"name\":\"Tea\",\"description\":\"hot cup of tea\"}"
 func (p *Products) UpdateProduct(rw http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	id, err := strconv.Atoi(vars["id"])
@@ -84,10 +86,23 @@ func (p *Products) MiddlewareValidateProduct(next http.Handler) http.Handler {
 
 		err := prod.FromJSON(req.Body)
 		if err != nil {
-			http.Error(rw, "Unable to unmarshal json", http.StatusBadRequest)
+			p.l.Println("[ERROR] Reading Product", err)
+			http.Error(rw, "Error Reading Product", http.StatusBadRequest)
+			return
 		}
 
 		p.l.Printf("Prod: %#v", prod)
+
+		err = prod.Validate()
+		if err != nil {
+			p.l.Println("[ERROR] Validating Product", err)
+			http.Error(
+				rw,
+				fmt.Sprintf("Error Validating Product: %s", err),
+				http.StatusBadRequest,
+			)
+			return
+		}
 
 		ctx := context.WithValue(req.Context(), KeyProduct{}, prod)
 		req = req.WithContext(ctx)
