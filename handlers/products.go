@@ -1,3 +1,17 @@
+// Package classification of Product API
+//
+// Documentation for Product API
+//
+// Schemes: http
+// BasePath: /
+// Version: 1.0.0
+//
+// Consumes:
+// - application/json
+//
+// Produces:
+// - application/json
+// swagger:meta
 package handlers
 
 import (
@@ -11,6 +25,26 @@ import (
 	"github.com/microservices_study/data"
 )
 
+// A list of products returns in the response
+// swagger:response productsResponse
+type productsResponseWrapper struct {
+	// All products in the system
+	// in: body
+	Body []data.Product
+}
+
+// swagger:response noContent
+type productsNoContent struct {
+}
+
+// swagger:parameters deleteProduct
+type productIDParameterWrapper struct {
+	// The id of the product to be deleted
+	// in: path
+	// required: true
+	ID int `json:"id"`
+}
+
 type Products struct {
 	l *log.Logger
 }
@@ -21,6 +55,13 @@ func NewProducts(l *log.Logger) *Products {
 
 // To execute GET in WINDOWS
 // curl -v localhost:9090 | jq
+
+// swagger:route GET /products products listOfProducts
+// Returns a list of products
+// responses:
+//	200: productsResponse
+
+// GetProducts returns the products from the data store
 func (p *Products) GetProducts(rw http.ResponseWriter, req *http.Request) {
 	p.l.Println("Handle GET Products")
 
@@ -75,6 +116,31 @@ func (p *Products) UpdateProduct(rw http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		http.Error(rw, "Product not found", http.StatusInternalServerError)
 		return
+	}
+}
+
+// curl -v localhost:9090/1 -XDELETE
+
+// swagger:route DELETE /products/{id} products deleteProduct
+// Delete a product
+// responses:
+//	201: noContent
+
+// DeleteProducts delete a product from the database
+func (p *Products) DeleteProduct(rw http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	id, _ := strconv.Atoi(vars["id"])
+
+	p.l.Println("Handle Delete Product", id)
+
+	err := data.DeleteProduct(id)
+
+	if err == data.ErrProductNotFound {
+		http.Error(rw, "Product not found", http.StatusNotFound)
+	}
+
+	if err != nil {
+		http.Error(rw, "Product not found", http.StatusInternalServerError)
 	}
 }
 

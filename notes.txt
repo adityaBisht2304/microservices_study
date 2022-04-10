@@ -1,3 +1,6 @@
+=>  To set a environment variable use below command as example
+    --- go env -w GO111MODULE=off
+    --- go env -w GOPRIVATE=code.siemens.com
 =>  req.Body is a io.Reader
 =>  responseWriter is a io.writer
 =>  json.Encoder and json.Decoder are faster than json.Marshal and json.Unmarshal
@@ -6,4 +9,20 @@
         curl -v localhost:9090 -d"{\"id\":4,\"name\":\"Tea\",\"description\":\"hot cup of tea\"}" | jq
     --- PUT REQUEST
         curl -v localhost:9090/2 -XPUT -d"{\"id\":2,\"name\":\"Tea\",\"description\":\"hot cup of tea\"}" | jq
-
+=>  For swagger in go
+    --- download swagger exe from https://github.com/go-swagger/go-swagger/releases/tag/v0.29.0
+    --- rename it to swagger.exe
+    --- Paste the exe in GOPATH\bin\ ie. D:\Go\bin\
+    --- Add the GOPATH\bin ie. D:\Go\bin in PATH variable
+=>  For jq in go
+    --- download jq exe from https://stedolan.github.io/jq/download/
+    --- rename it to jq.exe
+    --- Paste the exe in GOPATH\bin\ ie. D:\Go\bin\
+    --- Add the GOPATH\bin ie. D:\Go\bin in PATH variable
+=>  there should be no whitespace between the line swagger:meta and package packageName, otherwise
+    swagger generate will generate empty files
+=>  GO111MODULE needs to be ON to build the project which has dependencies mentioned in go.mod
+    --- go env -w GO111MODULE=on
+    --- go build
+=>  swagger open-api spec is a way to generate readable API documentation for the user of our APIs
+=>  microservices have common convention of /docs for viewing the documentation for public APIs
